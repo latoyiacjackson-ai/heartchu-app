@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Heartchu 💖</title>
+  <style>
+    :root {
+      --bg1: #fff5fb;
+      --bg2: #f4ecff;
+      --card: rgba(255,255,255,0.9);
+      --text: #2a1f35;
+      --muted: #6f6480;
+      --accent: #ff5fb1;
+      --accent2: #9b6cff;
+      --accent3: #ffd6ec;
+      --good: #20a464;
+      --warn: #cc7a00;
+      --shadow: 0 16px 40px rgba(125, 85, 165, 0.16);
+      --radius: 24px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, #ffe6f3 0%, transparent 28%),
+        radial-gradient(circle at top right, #efe4ff 0%, transparent 32%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      min-height: 100vh;
+    }
+    .app {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 16px 56px;
+    }
+    .hero, .card {
+      background: var(--card);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.55);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .hero {
+      padding: 28px;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent3), #eee3ff);
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1.05;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      margin-top: 18px;
+    }
+    .card {
+      padding: 22px;
+    }
+    .stack { display: grid; gap: 12px; }
+    .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    button {
+      border: 0;
+      border-radius: 16px;
+      padding: 13px 16px;
+      font-weight: 800;
+      font-size: 0.97rem;
+      cursor: pointer;
+      transition: transform .12s ease, opacity .12s ease, box-shadow .12s ease;
+    }
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: .6; cursor: not-allowed; }
+    .primary {
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      color: white;
+      box-shadow: 0 10px 22px rgba(155,108,255,0.28);
+    }
+    .secondary {
+      background: white;
+      color: var(--text);
+      border: 1px solid rgba(155,108,255,0.14);
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid rgba(155,108,255,0.14);
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+    .status.ok { color: var(--good); }
+    .status.warn { color: var(--warn); }
+    .quiz-area { margin-top: 18px; }
+    .question {
+      font-size: clamp(1.2rem, 2vw, 1.55rem);
+      font-weight: 900;
+      margin: 6px 0 16px;
+    }
+    .answers {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .answer-btn {
+      text-align: left;
+      background: white;
+      border: 1px solid rgba(155,108,255,0.16);
+      color: var(--text);
+      padding: 14px;
+      border-radius: 16px;
+      width: 100%;
+      font-weight: 700;
+    }
+    .answer-btn:hover {
+      box-shadow: 0 10px 20px rgba(155,108,255,0.10);
+      border-color: rgba(155,108,255,0.36);
+    }
+    .meta {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    .progress-wrap {
+      height: 12px;
+      background: rgba(155,108,255,0.12);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 16px 0 10px;
+    }
+    .progress {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width .2s ease;
+    }
+    .hidden { display: none !important; }
+    .result {
+      text-align: center;
+      padding: 24px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,240,248,0.92));
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.7);
+    }
+    .result h2 { margin: 6px 0 10px; font-size: clamp(1.6rem, 3vw, 2.4rem); }
+    .result p { color: var(--muted); font-size: 1.04rem; }
+    .footer-note {
+      margin-top: 18px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .small {
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+    code.inline {
+      padding: 2px 6px;
+      border-radius: 8px;
+      background: #f7f3ff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: #5f43af;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="hero">
+      <div class="badge">💖 Heartchu · Safe AI Quiz App</div>
+      <h1>Find your Hearts2Hearts vibe ✨</h1>
+      <p class="subtitle">Classic mode works instantly. AI mode creates fresh fan-style quizzes through a secure Netlify Function, so your API key stays off the page.</p>
+      <div class="controls" style="justify-content:center;">
+        <button id="classicBtn" class="primary">Start Classic Quiz</button>
+        <button id="aiBtn" class="secondary">Generate AI Quiz</button>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card stack">
+        <div class="pill">🎀 App Mode</div>
+        <div id="modeText" class="meta">Choose a mode to begin.</div>
+        <div id="apiStatus" class="meta status warn">AI mode checks your Netlify function. No key is stored in this HTML.</div>
+        <div class="small">Netlify function route: <code class="inline">/.netlify/functions/generate-quiz</code></div>
+      </div>
+
+      <div class="card stack">
+        <div class="pill">⚙️ AI Settings</div>
+        <label>
+          <div class="small">How many questions?</div>
+          <input id="questionCount" type="number" min="5" max="12" value="8" style="width:100%;margin-top:6px;padding:12px;border-radius:14px;border:1px solid rgba(155,108,255,.18);font:inherit;">
+        </label>
+        <label>
+          <div class="small">Quiz prompt vibe</div>
+          <textarea id="customPrompt" rows="5" style="width:100%;margin-top:6px;padding:12px;border-radius:14px;border:1px solid rgba(155,108,255,.18);font:inherit;resize:vertical;">Create a cute, age-appropriate, upbeat fan quiz inspired by Hearts2Hearts. Make it feel playful, stylish, and exciting for a young fan. Include clear result categories with short positive descriptions.</textarea>
+        </label>
+      </div>
+    </section>
+
+    <section id="quizCard" class="card quiz-area hidden">
+      <div class="meta" id="quizMeta">Question 1</div>
+      <div class="progress-wrap"><div class="progress" id="progressBar"></div></div>
+      <div class="question" id="questionText"></div>
+      <div class="answers" id="answersWrap"></div>
+      <div class="controls">
+        <button id="backBtn" class="secondary">Back</button>
+        <button id="restartBtn" class="secondary">Restart</button>
+      </div>
+    </section>
+
+    <section id="resultCard" class="card quiz-area hidden">
+      <div class="result">
+        <div class="badge">💖 Your Heartchu Result</div>
+        <h2 id="resultTitle"></h2>
+        <p id="resultDesc"></p>
+        <div class="controls" style="justify-content:center; margin-top:18px;">
+          <button id="playAgainBtn" class="primary">Play Again</button>
+          <button id="newAiBtn" class="secondary">New AI Quiz</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer-note">Made with love for London 💖</div>
+  </div>
+
+  <script>
+    const classicQuiz = {
+      title: "Heartchu Classic",
+      questions: [
+        {
+          text: "What is your main vibe?",
+          answers: [
+            { text: "Confident and polished", type: "star" },
+            { text: "Sweet and caring", type: "soft" },
+            { text: "Bold and stylish", type: "icon" },
+            { text: "Playful and funny", type: "cutie" }
+          ]
+        },
+        {
+          text: "Pick a dream weekend:",
+          answers: [
+            { text: "Performing on a big stage", type: "star" },
+            { text: "Cozy hangout with my favorite people", type: "soft" },
+            { text: "Putting together the perfect look", type: "icon" },
+            { text: "Games, snacks, and laughs", type: "cutie" }
+          ]
+        },
+        {
+          text: "Which color feels most like you?",
+          answers: [
+            { text: "Pink", type: "cutie" },
+            { text: "Lavender", type: "soft" },
+            { text: "Black", type: "icon" },
+            { text: "Gold", type: "star" }
+          ]
+        },
+        {
+          text: "What role would you want in a group?",
+          answers: [
+            { text: "Leader", type: "star" },
+            { text: "Mood maker", type: "cutie" },
+            { text: "Visual trendsetter", type: "icon" },
+            { text: "Heart of the team", type: "soft" }
+          ]
+        },
+        {
+          text: "Your friends usually say you are...",
+          answers: [
+            { text: "Reliable", type: "star" },
+            { text: "Gentle", type: "soft" },
+            { text: "Cool", type: "icon" },
+            { text: "Hilarious", type: "cutie" }
+          ]
+        },
+        {
+          text: "Pick your energy before going out:",
+          answers: [
+            { text: "Let's win the day", type: "star" },
+            { text: "Let's make this peaceful and pretty", type: "soft" },
+            { text: "I want to stand out", type: "icon" },
+            { text: "Let's have fun", type: "cutie" }
+          ]
+        },
+        {
+          text: "What would your fan intro line be?",
+          answers: [
+            { text: "I came to shine", type: "icon" },
+            { text: "I came to love people well", type: "soft" },
+            { text: "I came to lead with heart", type: "star" },
+            { text: "I came to bring joy", type: "cutie" }
+          ]
+        },
+        {
+          text: "Pick the ending to your perfect day:",
+          answers: [
+            { text: "A big win", type: "star" },
+            { text: "A peaceful moment", type: "soft" },
+            { text: "An iconic photo", type: "icon" },
+            { text: "One last laugh", type: "cutie" }
+          ]
+        }
+      ],
+      results: {
+        star: {
+          title: "The Star Leader 👑",
+          description: "You carry confident, grounded energy. People trust you, notice you, and naturally look to you when it is time to move."
+        },
+        soft: {
+          title: "The Soft Heart 🌸",
+          description: "You bring warmth, kindness, and calm. Your energy makes people feel safe, included, and seen."
+        },
+        icon: {
+          title: "The Icon ✨",
+          description: "You are stylish, memorable, and impossible to ignore. You do not chase the vibe. You become it."
+        },
+        cutie: {
+          title: "The Cutie Energy 🎀",
+          description: "You are bright, playful, and full of joy. You turn ordinary moments into fun memories people want more of."
+        }
+      }
+    };
+
+    let currentQuiz = null;
+    let currentIndex = 0;
+    let answersChosen = [];
+
+    const classicBtn = document.getElementById('classicBtn');
+    const aiBtn = document.getElementById('aiBtn');
+    const quizCard = document.getElementById('quizCard');
+    const resultCard = document.getElementById('resultCard');
+    const modeText = document.getElementById('modeText');
+    const apiStatus = document.getElementById('apiStatus');
+    const questionText = document.getElementById('questionText');
+    const quizMeta = document.getElementById('quizMeta');
+    const answersWrap = document.getElementById('answersWrap');
+    const progressBar = document.getElementById('progressBar');
+    const resultTitle = document.getElementById('resultTitle');
+    const resultDesc = document.getElementById('resultDesc');
+    const backBtn = document.getElementById('backBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const playAgainBtn = document.getElementById('playAgainBtn');
+    const newAiBtn = document.getElementById('newAiBtn');
+    const questionCount = document.getElementById('questionCount');
+    const customPrompt = document.getElementById('customPrompt');
+
+    function setModeText(text) {
+      modeText.textContent = text;
+    }
+
+    function showQuiz() {
+      quizCard.classList.remove('hidden');
+      resultCard.classList.add('hidden');
+    }
+
+    function showResult() {
+      quizCard.classList.add('hidden');
+      resultCard.classList.remove('hidden');
+    }
+
+    function restartQuiz() {
+      if (!currentQuiz) return;
+      currentIndex = 0;
+      answersChosen = [];
+      showQuiz();
+      renderQuestion();
+    }
+
+    function startQuiz(quiz, modeLabel) {
+      currentQuiz = quiz;
+      currentIndex = 0;
+      answersChosen = [];
+      setModeText(modeLabel);
+      showQuiz();
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const total = currentQuiz.questions.length;
+      const q = currentQuiz.questions[currentIndex];
+      quizMeta.textContent = `Question ${currentIndex + 1} of ${total}`;
+      questionText.textContent = q.text;
+      progressBar.style.width = `${((currentIndex) / total) * 100}%`;
+      answersWrap.innerHTML = '';
+
+      q.answers.forEach((answer, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.textContent = answer.text;
+        btn.addEventListener('click', () => {
+          answersChosen[currentIndex] = answer.type;
+          if (currentIndex < total - 1) {
+            currentIndex += 1;
+            renderQuestion();
+          } else {
+            progressBar.style.width = '100%';
+            renderResult();
+          }
+        });
+        answersWrap.appendChild(btn);
+      });
+
+      backBtn.disabled = currentIndex === 0;
+    }
+
+    function renderResult() {
+      const tally = {};
+      answersChosen.forEach(type => tally[type] = (tally[type] || 0) + 1);
+      const winner = Object.entries(tally).sort((a,b) => b[1] - a[1])[0]?.[0] || Object.keys(currentQuiz.results)[0];
+      const result = currentQuiz.results[winner];
+      resultTitle.textContent = result.title;
+      resultDesc.textContent = result.description;
+      showResult();
+    }
+
+    function normalizeQuizPayload(data) {
+      if (!data || !Array.isArray(data.questions) || !data.results || typeof data.results !== 'object') {
+        throw new Error('AI quiz payload is missing required fields.');
+      }
+
+      return {
+        title: data.title || 'Heartchu AI Quiz',
+        questions: data.questions.map(q => ({
+          text: q.text,
+          answers: q.answers.map(a => ({ text: a.text, type: a.type }))
+        })),
+        results: data.results
+      };
+    }
+
+    async function checkFunctionHealth() {
+      try {
+        const res = await fetch('/.netlify/functions/generate-quiz?health=1');
+        const text = await res.text();
+        let data = {};
+        try { data = text ? JSON.parse(text) : {}; } catch (e) { throw new Error('Function returned non-JSON health response.'); }
+        if (!res.ok) throw new Error(data.error || 'Function not reachable');
+        apiStatus.textContent = data.message || 'Function is ready.';
+        apiStatus.className = 'meta status ok';
+      } catch (err) {
+        apiStatus.textContent = 'AI function is not reachable yet. Classic mode still works. For AI mode, deploy this project through Git import or Netlify CLI, then set ANTHROPIC_API_KEY.';
+        apiStatus.className = 'meta status warn';
+      }
+    }
+
+    async function generateAiQuiz() {
+      aiBtn.disabled = true;
+      aiBtn.textContent = 'Generating...';
+      setModeText('Talking to the secure AI quiz generator...');
+
+      try {
+        const res = await fetch('/.netlify/functions/generate-quiz', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            count: Number(questionCount.value) || 8,
+            customPrompt: customPrompt.value.trim()
+          })
+        });
+
+        const text = await res.text();
+        let data = {};
+        try { data = text ? JSON.parse(text) : {}; } catch (e) {
+          throw new Error('The function returned something other than JSON. This usually means the Netlify Function was not deployed through Git or Netlify CLI.');
+        }
+        if (!res.ok) {
+          throw new Error(data.error || 'AI quiz generation failed.');
+        }
+
+        const quiz = normalizeQuizPayload(data.quiz);
+        startQuiz(quiz, 'AI quiz mode is live 💖');
+      } catch (err) {
+        console.error(err);
+        alert(err.message + '\n\nFalling back to classic mode for now.');
+        startQuiz(classicQuiz, 'Classic fallback mode');
+      } finally {
+        aiBtn.disabled = false;
+        aiBtn.textContent = 'Generate AI Quiz';
+      }
+    }
+
+    classicBtn.addEventListener('click', () => startQuiz(classicQuiz, 'Classic quiz mode'));
+    aiBtn.addEventListener('click', generateAiQuiz);
+    newAiBtn.addEventListener('click', generateAiQuiz);
+    restartBtn.addEventListener('click', restartQuiz);
+    playAgainBtn.addEventListener('click', restartQuiz);
+    backBtn.addEventListener('click', () => {
+      if (currentIndex > 0) {
+        currentIndex -= 1;
+        renderQuestion();
+      }
+    });
+
+    checkFunctionHealth();
+  </script>
+</body>
+</html>
